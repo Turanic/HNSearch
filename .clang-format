@@ -1,0 +1,49 @@
+---
+Language:        Cpp
+BasedOnStyle:  llvm
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AlwaysBreakTemplateDeclarations: true
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeBraces: Allman
+BreakConstructorInitializersBeforeComma: true
+BinPackArguments: false
+BinPackParameters: false
+ColumnLimit: 80
+ContinuationIndentWidth: 2
+Cpp11BracedListStyle: true
+KeepEmptyLinesAtTheStartOfBlocks: false
+IndentWidth: 2
+PointerAlignment: Left
+NamespaceIndentation: All
+
+IncludeCategories:
+  - Regex:           '<.*\.h>'
+    Priority:        2
+
+  - Regex:           '<.*\.hpp>'
+    Priority:        2
+
+  - Regex:           '<.*\.hh>'
+    Priority:        2
+
+  - Regex:           '<.*\.hxx>'
+    Priority:        4
+
+  - Regex:           '<.*'
+    Priority:        1
+
+  - Regex:           '.*'
+    Priority:        3
+
+PenaltyBreakBeforeFirstCallParameter: 500
+PenaltyBreakComment: 300
+PenaltyBreakFirstLessLess: 50
+PenaltyBreakString: 150
+PenaltyExcessCharacter: 1000
+PenaltyReturnTypeOnItsOwnLine: 70
+SortIncludes: true
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+Standard: Cpp11
