@@ -1,2 +1,3 @@
-# HNSearch
+# HNStat
+
 Algolia technical test
