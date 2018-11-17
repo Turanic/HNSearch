@@ -1,7 +1,9 @@
+#include <cassert>
 #include <iostream>
 #include "options/parser.hh"
 #include "tools/benchmark.hh"
 #include "tools/logger.hh"
+#include "tools/tsv_parser.hh"
 
 enum class mode
 {
@@ -77,13 +79,25 @@ int main(int argc, char* argv[])
   auto [file, nb_queries, ts_from, ts_to, cmode] =
     parse_command_line(argc, argv);
 
-  BENCH_START(bench_1, "full execution");
-
   LOG("file: %s; nb_queries: %s; range: [%s,%s]\n",
       file.data(),
       nb_queries.data(),
       ts_from.data(),
       ts_to.data());
+
+  BENCH_START(bench_1, "full execution");
+  tools::TSVParser prs{file.data(), ts_from, ts_to};
+
+  while (true)
+  {
+    auto [tm, elt, eof] = prs.read_element();
+    if (eof)
+      break;
+
+    assert(not elt.empty());
+
+    LOG("processing string %s\n", elt.c_str());
+  }
 
   return 0;
 }
