@@ -1,4 +1,5 @@
 #include "options/parser.hh"
+#include "tools/logger.hh"
 
 #include <iostream>
 
@@ -42,6 +43,9 @@ namespace
     auto opt_ts_to = opts.add_option("--to");
     opt_ts_to->with_value({&ts_to, options::ValPos::after});
 
+    auto opt_log = opts.add_option("--log");
+    opt_log->with_parse_cb([] { tools::Logger::log_get().enable(); });
+
     try
     {
       opts.parse();
@@ -66,8 +70,11 @@ int main(int argc, char* argv[])
   auto [file, nb_queries, ts_from, ts_to, cmode] =
     parse_command_line(argc, argv);
 
-  std::cout << "file: " << file << "\nnb_queries: " << nb_queries
-            << "\nrange: [" << ts_from << "," << ts_to << "]\n";
+  LOG("file: %s; nb_queries: %s; range: [%s,%s]\n",
+      file.data(),
+      nb_queries.data(),
+      ts_from.data(),
+      ts_to.data());
 
   return 0;
 }
