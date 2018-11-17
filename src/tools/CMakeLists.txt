@@ -1,1 +1,2 @@
-add_library(liba_tools INTERFACE)
+add_library(liba_tools STATIC
+  benchmark.cc)

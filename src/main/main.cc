@@ -1,7 +1,7 @@
-#include "options/parser.hh"
-#include "tools/logger.hh"
-
 #include <iostream>
+#include "options/parser.hh"
+#include "tools/benchmark.hh"
+#include "tools/logger.hh"
 
 enum class mode
 {
@@ -43,8 +43,15 @@ namespace
     auto opt_ts_to = opts.add_option("--to");
     opt_ts_to->with_value({&ts_to, options::ValPos::after});
 
-    auto opt_log = opts.add_option("--log");
-    opt_log->with_parse_cb([] { tools::Logger::log_get().enable(); });
+#ifndef NDEBUG
+    {
+      using namespace tools;
+      opts.add_option("--log")->with_parse_cb(
+        [] { Logger::log_get().enable(); });
+      opts.add_option("--bench")->with_parse_cb(
+        [] { Benchmark::benchmark_get().enable(); });
+    }
+#endif
 
     try
     {
@@ -69,6 +76,8 @@ int main(int argc, char* argv[])
 {
   auto [file, nb_queries, ts_from, ts_to, cmode] =
     parse_command_line(argc, argv);
+
+  BENCH_START(bench_1, "full execution");
 
   LOG("file: %s; nb_queries: %s; range: [%s,%s]\n",
       file.data(),

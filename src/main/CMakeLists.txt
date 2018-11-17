@@ -3,4 +3,5 @@ add_executable(${CMAKE_PROJECT_NAME}
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
   liba_options
+  liba_tools
   )
