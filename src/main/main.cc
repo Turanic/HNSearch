@@ -4,6 +4,7 @@
 #include "tools/benchmark.hh"
 #include "tools/logger.hh"
 #include "tools/tsv_parser.hh"
+#include "trie/trie.hh"
 
 enum class mode
 {
@@ -87,6 +88,7 @@ int main(int argc, char* argv[])
 
   BENCH_START(bench_1, "full execution");
   tools::TSVParser prs{file.data(), ts_from, ts_to};
+  trie::Trie words{};
 
   while (true)
   {
@@ -97,6 +99,17 @@ int main(int argc, char* argv[])
     assert(not elt.empty());
 
     LOG("processing string %s\n", elt.c_str());
+    words.emplace(elt);
+  }
+  LOG("Final tree is composed of %lu nodes\n", words.size());
+
+  switch (cmode)
+  {
+  case mode::distinct:
+    std::cout << words.get_distinct_queries() << '\n';
+    break;
+  default:
+    break;
   }
 
   return 0;
