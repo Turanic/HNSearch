@@ -16,7 +16,10 @@ namespace trie
     auto& children = root_node.children;
 
     if (start == end)
-      return ++root_node.freq;
+    {
+      ++root_node.freq;
+      return root_idx;
+    }
 
     auto child_iter =
       std::find_if(children.begin(), children.end(), [start](const auto& elt) {
@@ -30,8 +33,9 @@ namespace trie
       children.emplace_back(chunks_.push(start, end), new_idx);
       auto& new_node = nodes_.emplace_back(node{});
       new_node.parent = root_idx;
+      ++new_node.freq;
 
-      return ++new_node.freq;
+      return new_idx;
     }
     assert(child_iter != children.end());
 
@@ -69,8 +73,14 @@ namespace trie
         nodes_.emplace_back(node{}).parent = inter_idx;
       }
 
-      return left_chunk.empty() ? ++nodes_[inter_idx].freq
-                                : ++nodes_[left_idx].freq;
+      if (left_chunk.empty())
+      {
+        ++nodes_[inter_idx].freq;
+        return inter_idx;
+      }
+
+      ++nodes_[left_idx].freq;
+      return left_idx;
     }
 
     assert(sit == str.end());
@@ -86,5 +96,31 @@ namespace trie
   inline unsigned Trie::get_distinct_queries() const
   {
     return distinct_queries_;
+  }
+
+  inline std::vector<std::pair<std::string, unsigned>> Trie::get_top_queries() const
+  {
+    std::vector<std::pair<std::string, unsigned>> res{};
+
+    for (auto idx : top_queries_)
+    {
+      std::string word{};
+      auto freq = nodes_[idx].freq;
+
+      while (idx != 0)
+      {
+        const auto& node = nodes_[idx];
+        const auto& parent = nodes_[node.parent];
+        auto it =
+          std::find_if(parent.children.begin(),
+                       parent.children.end(),
+                       [idx](const auto& e) { return e.child_idx == idx; });
+        word = std::string{it->value} + word;
+        idx = node.parent;
+      }
+      res.emplace_back(word, freq);
+    }
+
+    return res;
   }
 } // namespace trie

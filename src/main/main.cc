@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 
   BENCH_START(bench_1, "full execution");
   tools::TSVParser prs{file.data(), ts_from, ts_to};
-  trie::Trie words{};
+  trie::Trie words{30};
 
   while (true)
   {
@@ -108,6 +108,13 @@ int main(int argc, char* argv[])
   case mode::distinct:
     std::cout << words.get_distinct_queries() << '\n';
     break;
+  case mode::top:
+  {
+    auto top = words.get_top_queries();
+    for (const auto& [word, freq] : top)
+      std::cout << word << " " << freq << '\n';
+    break;
+  }
   default:
     break;
   }
