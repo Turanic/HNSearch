@@ -1,8 +1,8 @@
 #pragma once
 
-#include <deque>
 #include <string_view>
 #include <vector>
+#include "chunk_memory.hh"
 
 namespace trie
 {
@@ -40,13 +40,9 @@ namespace trie
     template <typename InputIt>
     unsigned insert_node(index_t root_idx, InputIt start, InputIt end);
 
-    template <typename InputIt>
-    std::string_view push_to_memory(InputIt start, InputIt end);
-
-    std::vector<node> nodes_{};
-
     unsigned distinct_queries_ = 0;
-    std::deque<std::string> memory_{};
+    std::vector<node> nodes_{};
+    ChunkMemory chunks_{};
   };
 } // namespace trie
 

@@ -4,3 +4,5 @@ add_library(liba_trie STATIC
 target_link_libraries(liba_trie
   liba_tools
   )
+
+add_subdirectory(tests)

@@ -1,7 +1,7 @@
 #include "trie.hh"
-#include <algorithm>
-#include "tools/logger.hh"
+#include <cassert>
 #include "tools/benchmark.hh"
+#include "tools/logger.hh"
 
 namespace trie
 {
@@ -22,6 +22,8 @@ namespace trie
 
     BENCH_START(bench_insert, "node insertion");
     auto freq = insert_node(0, str.begin(), str.end());
+    assert(freq > 0);
+
     distinct_queries_ += freq == 1;
   }
 } // namespace trie

@@ -1,18 +1,17 @@
 #pragma once
-#include <algorithm>
+
 #include "trie.hh"
+
+#include <algorithm>
+#include <cassert>
 
 namespace trie
 {
   template <typename InputIt>
-  std::string_view Trie::push_to_memory(InputIt start, InputIt end)
-  {
-    return memory_.emplace_back(start, end);
-  }
-
-  template <typename InputIt>
   unsigned Trie::insert_node(index_t root_idx, InputIt start, InputIt end)
   {
+    assert(root_idx < nodes_.size());
+
     auto& root_node = nodes_.at(root_idx);
     auto& children = root_node.children;
 
@@ -28,32 +27,35 @@ namespace trie
     if (child_iter == children.end())
     {
       auto new_idx = size();
-      children.emplace_back(push_to_memory(start, end), new_idx);
+      children.emplace_back(chunks_.push(start, end), new_idx);
       auto& new_node = nodes_.emplace_back(node{});
       new_node.parent = root_idx;
 
       return ++new_node.freq;
     }
+    assert(child_iter != children.end());
 
     const auto& str = child_iter->value;
     auto [new_start, sit] = std::mismatch(start, end, str.begin(), str.end());
 
     /* Second case: Insert a new node between this one and the child */
     if (sit != str.end())
-    {;
+    {
       auto off = std::distance(str.begin(), sit);
       std::string_view first_chunk(str.data(), off);
       std::string_view right_chunk(str.data() + off, str.size() - off);
-      std::string_view left_chunk(push_to_memory(new_start, end));
+      std::string_view left_chunk(chunks_.push(new_start, end));
       auto old_child_idx = child_iter->child_idx;
 
       /* create the new intermediate node*/
+      assert(not first_chunk.empty());
       auto inter_idx = size();
       child_iter->value = std::move(first_chunk);
       child_iter->child_idx = inter_idx;
       nodes_.emplace_back(node{}).parent = root_idx;
 
       /* create the right son node */
+      assert(not right_chunk.empty());
       nodes_[inter_idx].children.emplace_back(std::move(right_chunk),
                                               old_child_idx);
       nodes_[old_child_idx].parent = inter_idx;
@@ -70,6 +72,8 @@ namespace trie
       return left_chunk.empty() ? ++nodes_[inter_idx].freq
                                 : ++nodes_[left_idx].freq;
     }
+
+    assert(sit == str.end());
 
     return insert_node(child_iter->child_idx, new_start, end);
   }
