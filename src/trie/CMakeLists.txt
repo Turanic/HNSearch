@@ -1,5 +1,6 @@
 add_library(liba_trie STATIC
-  trie.cc)
+  top_list.cc
+  distinct.cc)
 
 target_link_libraries(liba_trie
   liba_tools

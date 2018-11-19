@@ -1,4 +1,5 @@
 #include <trie/chunk_memory.hh>
+#include <trie/top_list.hh>
 #include <trie/trie.hh>
 
 namespace
@@ -20,7 +21,7 @@ namespace
 
   bool check_word_insertion()
   {
-    trie::Trie tree{};
+    trie::Trie<trie::TopList> tree{10u};
 
     if (tree.size() != 1)
       return false;
@@ -54,7 +55,7 @@ namespace
 
   bool check_distinct_queries()
   {
-    trie::Trie tree{};
+    trie::Trie<trie::TopList> tree{10u};
 
     tree.emplace("hello world");
     tree.emplace("hello");

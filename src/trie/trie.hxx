@@ -4,11 +4,15 @@
 
 #include <algorithm>
 #include <cassert>
+#include "tools/benchmark.hh"
+#include "tools/logger.hh"
 
 namespace trie
 {
+  template <typename Command>
   template <typename InputIt>
-  unsigned Trie::insert_node(index_t root_idx, InputIt start, InputIt end)
+  unsigned
+  Trie<Command>::insert_node(index_t root_idx, InputIt start, InputIt end)
   {
     assert(root_idx < nodes_.size());
 
@@ -88,39 +92,56 @@ namespace trie
     return insert_node(child_iter->child_idx, new_start, end);
   }
 
-  inline std::size_t Trie::size() const
+  template <typename Command>
+  std::size_t Trie<Command>::size() const
   {
     return std::size(nodes_);
   }
 
-  inline unsigned Trie::get_distinct_queries() const
+  template <typename Command>
+  unsigned Trie<Command>::get_distinct_queries() const
   {
     return distinct_queries_;
   }
 
-  inline std::vector<std::pair<std::string, unsigned>> Trie::get_top_queries() const
+  template <typename Command>
+  template <typename... Args>
+  Trie<Command>::Trie(Args&&... args)
+      : cmd_{&nodes_, std::forward<Args>(args)...}
   {
-    std::vector<std::pair<std::string, unsigned>> res{};
+    nodes_.resize(1);
 
-    for (auto idx : top_queries_)
-    {
-      std::string word{};
-      auto freq = nodes_[idx].freq;
+    LOG("sizeof(node) = %lu\n", sizeof(node));
+    LOG("sizeof(edge) = %lu\n", sizeof(edge));
+  }
 
-      while (idx != 0)
-      {
-        const auto& node = nodes_[idx];
-        const auto& parent = nodes_[node.parent];
-        auto it =
-          std::find_if(parent.children.begin(),
-                       parent.children.end(),
-                       [idx](const auto& e) { return e.child_idx == idx; });
-        word = std::string{it->value} + word;
-        idx = node.parent;
-      }
-      res.emplace_back(word, freq);
-    }
+  template <typename Command>
+  Trie<Command>::Trie()
+      : cmd_{&nodes_}
+  {
+    nodes_.resize(1);
 
-    return res;
+    LOG("sizeof(node) = %lu\n", sizeof(node));
+    LOG("sizeof(edge) = %lu\n", sizeof(edge));
+  }
+
+  template <typename Command>
+  void Trie<Command>::emplace(std::string_view str)
+  {
+    if (str.empty())
+      return;
+
+    BENCH_START(bench_insert, "node insertion");
+    auto node_idx = insert_node(0, str.begin(), str.end());
+
+    assert(nodes_.at(node_idx).freq > 0);
+
+    cmd_(node_idx);
+  }
+
+  template <typename Command>
+  typename Command::result_t Trie<Command>::command_get_result() const
+  {
+    return cmd_.result_get();
   }
 } // namespace trie

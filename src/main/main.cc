@@ -4,6 +4,8 @@
 #include "tools/benchmark.hh"
 #include "tools/logger.hh"
 #include "tools/tsv_parser.hh"
+#include "trie/distinct.hh"
+#include "trie/top_list.hh"
 #include "trie/trie.hh"
 
 enum class mode
@@ -73,6 +75,37 @@ namespace
 
     return std::make_tuple(file, nb_queries, ts_from, ts_to, current_mode);
   }
+
+  template <typename Command>
+  void parse_datas(trie::Trie<Command>& words, tools::TSVParser& prs)
+  {
+    while (true)
+    {
+      auto [tm, elt, eof] = prs.read_element();
+      if (eof)
+        break;
+
+      assert(not elt.empty());
+
+      LOG("processing string %s\n", elt.c_str());
+      words.emplace(elt);
+    }
+    LOG("Final tree is composed of %lu nodes\n", words.size());
+
+    if constexpr (std::is_same_v<Command, trie::TopList>)
+    {
+      auto results = words.command_get_result();
+      for (const auto& [word, freq] : results)
+        std::cout << word << " " << freq << '\n';
+      return;
+    }
+
+    if constexpr (std::is_same_v<Command, trie::Distinct>)
+    {
+      std::cerr << words.command_get_result() << '\n';
+      return;
+    }
+  }
 } // namespace
 
 int main(int argc, char* argv[])
@@ -88,31 +121,18 @@ int main(int argc, char* argv[])
 
   BENCH_START(bench_1, "full execution");
   tools::TSVParser prs{file.data(), ts_from, ts_to};
-  trie::Trie words{30};
-
-  while (true)
-  {
-    auto [tm, elt, eof] = prs.read_element();
-    if (eof)
-      break;
-
-    assert(not elt.empty());
-
-    LOG("processing string %s\n", elt.c_str());
-    words.emplace(elt);
-  }
-  LOG("Final tree is composed of %lu nodes\n", words.size());
-
   switch (cmode)
   {
   case mode::distinct:
-    std::cout << words.get_distinct_queries() << '\n';
+  {
+    trie::Trie<trie::Distinct> trie{};
+    parse_datas(trie, prs);
     break;
+  }
   case mode::top:
   {
-    auto top = words.get_top_queries();
-    for (const auto& [word, freq] : top)
-      std::cout << word << " " << freq << '\n';
+    trie::Trie<trie::TopList> trie{10u};
+    parse_datas(trie, prs);
     break;
   }
   default:
