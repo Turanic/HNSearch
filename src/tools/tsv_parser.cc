@@ -2,6 +2,7 @@
 #include <ctime>
 #include <stdexcept>
 #include "string_conversion.hh"
+#include "benchmark.hh"
 
 namespace tools
 {
@@ -27,6 +28,7 @@ namespace tools
 
     do
     {
+      BENCH_START(bench_parse, "read element from file");
       std::string timestamp_str;
       reader >> timestamp_str >> url;
 

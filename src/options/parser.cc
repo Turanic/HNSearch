@@ -4,7 +4,6 @@
 
 namespace options
 {
-
   void OptionsParser::parse()
   {
     for (auto& option : options_)
@@ -31,6 +30,12 @@ namespace options
         throw std::runtime_error{"option required"};
       else if (option->state == OptState::validated && option->parse_cb)
         option->parse_cb();
+    }
+
+    for (const auto& [str, validated] : cmd_)
+    {
+      if (not validated)
+        throw std::runtime_error{std::string{str.data(), str.size()}};
     }
   }
 

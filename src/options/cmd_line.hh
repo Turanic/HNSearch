@@ -19,9 +19,12 @@ namespace options
     const std::pair<std::string_view, bool>& operator[](std::size_t idx) const;
 
     using const_iterator = decltype(args_)::const_iterator;
+    using iterator = decltype(args_)::iterator;
     const_iterator cbegin() const noexcept;
     const_iterator cend() const noexcept;
-    const_iterator erase(const_iterator it);
+    iterator begin() noexcept;
+    iterator end() noexcept;
+    iterator erase(const_iterator it);
     std::size_t size() const noexcept;
   };
 } // namespace options

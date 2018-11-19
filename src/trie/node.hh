@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string_view>
 #include <vector>
 
 namespace trie
@@ -12,16 +11,21 @@ namespace trie
   using index_t = unsigned int;
 
   /* represent a link between two nodes.
-   * value is a reference to a part of a chunk.
-   * child_idx is the index of the child node */
+   * value_ptr/_len is a reference to a part of a chunk.
+   * child_idx is the index of the child node.
+   *
+   * Remark: a string_view could be used here but takes more
+   * memory (In fact, the struct would size 8 bytes more) */
   struct edge
   {
-    std::string_view value;
+    const char* value_ptr;
+    unsigned value_len;
     index_t child_idx;
 
-    edge(std::string_view v, index_t c)
-        : value{v}
-        , child_idx{c}
+    edge(const char* ptr, unsigned len, index_t idx)
+        : value_ptr{ptr}
+        , value_len{len}
+        , child_idx{idx}
     {
     }
   };

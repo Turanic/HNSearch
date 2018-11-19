@@ -54,7 +54,7 @@ namespace trie
           std::find_if(parent.children.begin(),
                        parent.children.end(),
                        [idx](const auto& e) { return e.child_idx == idx; });
-        word = std::string{it->value} + word;
+        word = std::string(it->value_ptr, it->value_len) + word;
         idx = node.parent;
       }
       res.emplace_back(word, freq);

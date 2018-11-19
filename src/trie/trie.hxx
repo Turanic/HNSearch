@@ -14,40 +14,42 @@ namespace trie
   unsigned
   Trie<Command>::insert_node(index_t root_idx, InputIt start, InputIt end)
   {
-    assert(root_idx < nodes_.size());
-
-    auto& root_node = nodes_.at(root_idx);
-    auto& children = root_node.children;
-
-    if (start == end)
+    while (start != end)
     {
-      ++root_node.freq;
-      return root_idx;
+      assert(root_idx < nodes_.size());
+
+      auto& children = nodes_[root_idx].children;
+      auto child_iter = std::find_if(children.begin(),
+                                     children.end(),
+                                     [start](const auto& elt) {
+                                       assert(elt.value_ptr != nullptr);
+                                       return *start == *elt.value_ptr;
+                                     });
+
+      /* First case: Completly new fragment */
+      if (child_iter == children.end())
+      {
+        return create_new_child(root_idx, start, end);
+      }
+      assert(child_iter != children.end());
+
+      auto str = child_iter->value_ptr;
+      auto str_end = str + child_iter->value_len;
+      auto [new_start, sit] = std::mismatch(start, end, str, str_end);
+
+      /* Second case: Insert a new node between this one and the child */
+      if (sit != str_end)
+      {
+        return break_edge(root_idx, &*child_iter, sit, new_start, end);
+      }
+      assert(sit == str_end);
+
+      root_idx = child_iter->child_idx;
+      start = new_start;
     }
 
-    auto child_iter =
-      std::find_if(children.begin(), children.end(), [start](const auto& elt) {
-        return *start == elt.value.front();
-      });
-
-    /* First case: Completly new fragment */
-    if (child_iter == children.end())
-    {
-      return create_new_child(root_idx, start, end);
-    }
-    assert(child_iter != children.end());
-
-    const auto& str = child_iter->value;
-    auto [new_start, sit] = std::mismatch(start, end, str.begin(), str.end());
-
-    /* Second case: Insert a new node between this one and the child */
-    if (sit != str.end())
-    {
-      return break_edge(root_idx, &*child_iter, sit, new_start, end);
-    }
-    assert(sit == str.end());
-
-    return insert_node(child_iter->child_idx, new_start, end);
+    ++nodes_[root_idx].freq;
+    return root_idx;
   }
 
   template <typename Command>
@@ -57,7 +59,8 @@ namespace trie
   {
     auto& children = nodes_[root_idx].children;
     auto new_idx = size();
-    children.emplace_back(chunks_.push(start, end), new_idx);
+    auto chunk = chunks_.push(start, end);
+    children.emplace_back(chunk.data(), chunk.size(), new_idx);
     auto& new_node = nodes_.emplace_back(node{});
     new_node.parent = root_idx;
     ++new_node.freq;
@@ -73,23 +76,25 @@ namespace trie
                                     InputIt start,
                                     InputIt end)
   {
-    auto off = std::distance(edge_ptr->value.begin(), break_loc);
-    std::string_view first_chunk(edge_ptr->value.data(), off);
-    std::string_view right_chunk(edge_ptr->value.data() + off,
-                                 edge_ptr->value.size() - off);
+    auto off = std::distance(edge_ptr->value_ptr, break_loc);
+    std::string_view first_chunk(edge_ptr->value_ptr, off);
+    std::string_view right_chunk(edge_ptr->value_ptr + off,
+                                 edge_ptr->value_len - off);
     std::string_view left_chunk(chunks_.push(start, end));
     auto old_child_idx = edge_ptr->child_idx;
 
     /* create the new intermediate node*/
     assert(not first_chunk.empty());
     auto inter_idx = size();
-    edge_ptr->value = std::move(first_chunk);
+    edge_ptr->value_ptr = first_chunk.data();
+    edge_ptr->value_len = first_chunk.size();
     edge_ptr->child_idx = inter_idx;
     nodes_.emplace_back(node{}).parent = root_idx;
 
     /* create the right son node */
     assert(not right_chunk.empty());
-    nodes_[inter_idx].children.emplace_back(std::move(right_chunk),
+    nodes_[inter_idx].children.emplace_back(right_chunk.data(),
+                                            right_chunk.size(),
                                             old_child_idx);
     nodes_[old_child_idx].parent = inter_idx;
 
@@ -97,7 +102,9 @@ namespace trie
     if (not left_chunk.empty())
     {
       /* create the left son node */
-      nodes_[inter_idx].children.emplace_back(std::move(left_chunk), left_idx);
+      nodes_[inter_idx].children.emplace_back(left_chunk.data(),
+                                              right_chunk.size(),
+                                              left_idx);
       nodes_.emplace_back(node{}).parent = inter_idx;
     }
 
