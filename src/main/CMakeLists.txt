@@ -6,3 +6,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
   liba_tools
   liba_trie
   )
+
+target_link_libraries(${CMAKE_PROJECT_NAME}
+  debug -fsanitize=address)

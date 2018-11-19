@@ -7,8 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # compile flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Wextra -pedantic -Weffc++ -Werror")
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb3")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
+set(CMAKE_CXX_FLAG_DEBUG "-O0 -ggdb3 -fsanitize=address")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-Og -ggdb3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 
 enable_testing()
 
