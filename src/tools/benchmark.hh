@@ -6,17 +6,24 @@
 
 #ifndef NDEBUG
 #define BENCH_START(name, bench)                                               \
-  auto name = tools::Benchmark::benchmark_get().start_bench(bench);
+  auto name = tools::Benchmark::benchmark_get().start_bench(bench)
 #define BENCH_STOP(name)                                                       \
-  if (name != nullptr)                                                         \
+  do                                                                           \
   {                                                                            \
-    name.reset();                                                              \
-  }
+    if (name != nullptr)                                                       \
+    {                                                                          \
+      name.reset();                                                            \
+    }                                                                          \
+  } while (0)
 #else
 #define BENCH_START(name, bench)                                               \
-  (void)name;                                                                  \
-  (void)bench;
-#define BENCH_STOP(name) (void)name;
+  do                                                                           \
+  {                                                                            \
+  } while (0)
+#define BENCH_STOP(name)                                                       \
+  do                                                                           \
+  {                                                                            \
+  } while (0)
 #endif
 
 namespace tools

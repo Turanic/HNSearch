@@ -26,6 +26,16 @@ namespace trie
     template <typename InputIt>
     index_t insert_node(index_t root_idx, InputIt start, InputIt end);
 
+    template <typename InputIt>
+    index_t create_new_child(index_t root_idx, InputIt start, InputIt end);
+
+    template <typename InputIt>
+    index_t break_edge(index_t root_idx,
+                       edge* edge_ptr,
+                       InputIt break_loc,
+                       InputIt start,
+                       InputIt end);
+
     std::vector<node> nodes_{};
     ChunkMemory chunks_{};
 

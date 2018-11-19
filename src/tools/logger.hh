@@ -2,15 +2,16 @@
 
 #ifndef NDEBUG
 #define LOG(...)                                                               \
+  do                                                                           \
   {                                                                            \
     if (tools::Logger::log_get().is_enabled())                                 \
       tools::Logger::log_get().log(__VA_ARGS__);                               \
-  }
+  } while (0)
 #else
 #define LOG(...)                                                               \
+  do                                                                           \
   {                                                                            \
-    (void)__VA_ARGS__;                                                         \
-  }
+  } while (0)
 #endif
 
 namespace tools
