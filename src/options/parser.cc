@@ -1,8 +1,10 @@
 #include "parser.hh"
+#include <cassert>
 #include <stdexcept>
 
 namespace options
 {
+
   void OptionsParser::parse()
   {
     for (auto& option : options_)
@@ -12,11 +14,14 @@ namespace options
 
       if (option->position.has_value())
       {
-        validate_option(*option, option->position.value());
+        validate_option(*option, *option->position);
         continue;
       }
 
-      auto cmd_itr = std::find(cmd_.cbegin(), cmd_.cend(), option->label);
+      auto cmd_itr =
+        std::find_if(cmd_.cbegin(), cmd_.cend(), [&option](const auto& elt) {
+          return option->label == elt.first && not elt.second;
+        });
       validate_option(*option, std::distance(cmd_.cbegin(), cmd_itr));
     }
 
@@ -33,38 +38,36 @@ namespace options
                                    std::size_t cmd_pos,
                                    ValPos pos)
   {
+    std::size_t val_pos = 0;
+    bool out = true;
     switch (pos)
     {
     case ValPos::after:
-    {
-      auto val_pos = cmd_pos + 1;
-      if (cmd_pos >= cmd_.size() - 1)
-        return false;
-      *val = cmd_.at(val_pos);
-      cmd_.erase(cmd_.cbegin() + val_pos);
-      return true;
-    }
+      val_pos = cmd_pos + 1;
+      out = cmd_pos >= cmd_.size() - 1;
+      break;
     case ValPos::before:
-    {
-      auto val_pos = cmd_pos - 1;
-      if (cmd_pos == 0)
-        return false;
-      *val = cmd_.at(val_pos);
-      cmd_.erase(cmd_.cbegin() + val_pos);
-      return true;
-    }
+      val_pos = cmd_pos - 1;
+      out = cmd_pos == 0;
+      break;
     case ValPos::last:
-    {
-      auto val_pos = cmd_.size() - 1;
-      if (cmd_pos == cmd_.size())
-        return false;
-      *val = cmd_.at(val_pos);
-      cmd_.erase(cmd_.cbegin() + val_pos);
-      return true;
-    }
+      val_pos = cmd_.size() - 1;
+      out = cmd_pos == cmd_.size();
+      break;
     default:
-      return false;
+      break;
     };
+
+    if (out)
+      return false;
+
+    const auto& [str, validated] = cmd_[val_pos];
+    if (validated)
+      return false;
+
+    *val = str;
+    cmd_[val_pos].second = true;
+    return true;
   }
 
   void OptionsParser::validate_option(Option& opt, std::size_t cmd_pos)
@@ -72,7 +75,10 @@ namespace options
     if (cmd_pos >= cmd_.size())
       return;
 
-    if (cmd_.at(cmd_pos) != opt.label)
+    const auto& [str, validated] = cmd_[cmd_pos];
+    assert(not validated);
+
+    if (str != opt.label)
       return;
 
     for (auto& val : opt.values)
@@ -86,5 +92,6 @@ namespace options
       opt_ptr->state = OptState::required;
 
     opt.state = OptState::validated;
+    cmd_[cmd_pos].second = true;
   }
 } // namespace options

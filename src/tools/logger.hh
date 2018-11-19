@@ -1,5 +1,8 @@
 #pragma once
 
+/* Custom logging library.
+ *
+ * Remark: LOG macro is disabled on release builds. */
 #ifndef NDEBUG
 #define LOG(...)                                                               \
   do                                                                           \

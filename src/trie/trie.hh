@@ -8,27 +8,40 @@
 
 namespace trie
 {
+  /* The trie class is a data container used to efficiently
+   * store strings. It can be parameterized with a Command.
+   * Commands are used to apply an additional algorithm at
+   * each insertion */
   template <typename Command = Dummy>
   class Trie
   {
   public:
+    /* Constructors of the Trie. Arguments are forwarded to
+     * the underlying command */
     Trie();
     template <typename... Args>
     Trie(Args&&... args);
 
+    /* push a new string in the Trie */
     void emplace(std::string_view element);
-    std::size_t size() const;
-    unsigned get_distinct_queries() const;
 
+    /* return the number of nodes contained in the Trie */
+    std::size_t size() const;
+
+    /* get the result of the underlying command */
     typename Command::result_t command_get_result() const;
 
   private:
+    /* helper function the insert a range of characters in the trie with
+     * root node at index root_idx */
     template <typename InputIt>
     index_t insert_node(index_t root_idx, InputIt start, InputIt end);
 
+    /* helper function the insert a new child to the node at the index root_idx */
     template <typename InputIt>
     index_t create_new_child(index_t root_idx, InputIt start, InputIt end);
 
+    /* helper function the insert a node between two others. */
     template <typename InputIt>
     index_t break_edge(index_t root_idx,
                        edge* edge_ptr,

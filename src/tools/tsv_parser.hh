@@ -7,6 +7,9 @@
 
 namespace tools
 {
+  /* Simple parser that will iterate over tokens of a file
+   * following the format "\t timestamp \t word \t ..." and
+   * output words associated with a timestamp of a certain range */
   class TSVParser
   {
   public:

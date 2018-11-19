@@ -7,6 +7,9 @@
 
 namespace options
 {
+  /* Main class of the Option parser.
+   * Used to define options expected in arguments,
+   * parse them, and extract values. */
   class OptionsParser
   {
   public:

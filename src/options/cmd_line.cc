@@ -7,12 +7,18 @@ namespace options
   {
     args_.reserve(argc);
     for (int i = 0; i < argc; ++i)
-      args_.emplace_back(argv[i]);
+      args_.emplace_back(argv[i], false);
   }
 
-  std::string_view CmdLine::at(std::size_t idx)
+  std::pair<std::string_view, bool>& CmdLine::operator[](std::size_t idx)
   {
-    return args_.at(idx);
+    return args_[idx];
+  }
+
+  const std::pair<std::string_view, bool>&
+  CmdLine::operator[](std::size_t idx) const
+  {
+    return args_[idx];
   }
 
   CmdLine::const_iterator CmdLine::erase(const_iterator it)

@@ -2,6 +2,7 @@
 
 namespace options
 {
+  /* Position of the value relatively to the option */
   enum class ValPos
   {
     after,
@@ -9,6 +10,7 @@ namespace options
     last
   };
 
+  /* Value associated with an option */
   struct Value
   {
     std::string_view* value = nullptr;

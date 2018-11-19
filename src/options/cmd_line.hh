@@ -5,15 +5,18 @@
 
 namespace options
 {
+  /* Simple representation of the command line.
+   * In short, this is a wrapper around the standard char*[]. */
   class CmdLine
   {
   private:
-    std::vector<std::string_view> args_{};
+    std::vector<std::pair<std::string_view, bool>> args_{};
 
   public:
     CmdLine(int argc, char** argv);
 
-    std::string_view at(std::size_t idx);
+    std::pair<std::string_view, bool>& operator[](std::size_t idx);
+    const std::pair<std::string_view, bool>& operator[](std::size_t idx) const;
 
     using const_iterator = decltype(args_)::const_iterator;
     const_iterator cbegin() const noexcept;

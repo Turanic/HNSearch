@@ -4,6 +4,8 @@
 
 namespace trie
 {
+  /* Dummy command does not do anything and is used
+   * only for tests purposes */
   class Dummy
   {
   public:

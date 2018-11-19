@@ -7,12 +7,6 @@ namespace options
   {
   }
 
-  Option* Option::with_description(std::string str)
-  {
-    desc = std::move(str);
-    return this;
-  }
-
   Option* Option::with_position(std::size_t pos)
   {
     position = pos;

@@ -7,6 +7,7 @@
 
 namespace options
 {
+  /* Different possible states of a defined option */
   enum class OptState
   {
     validated,
@@ -15,11 +16,11 @@ namespace options
     optional
   };
 
+  /* Represent an option expected in the executable arguments. */
   struct Option
   {
     explicit Option(std::string str);
 
-    Option* with_description(std::string str);
     Option* with_position(std::size_t pos);
     Option* with_value(Value val);
     Option* is_mandatory();
@@ -34,7 +35,6 @@ namespace options
     }
 
     std::string label{};
-    std::string desc{};
     std::optional<std::size_t> position{};
     bool value = false;
 

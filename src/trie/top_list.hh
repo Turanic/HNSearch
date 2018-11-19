@@ -4,6 +4,8 @@
 
 namespace trie
 {
+  /* TopList command keep track of the most frequent words inserted
+   * in a trie */
   class TopList
   {
   public:

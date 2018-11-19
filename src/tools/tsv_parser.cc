@@ -1,7 +1,7 @@
 #include "tsv_parser.hh"
-#include <charconv>
 #include <ctime>
 #include <stdexcept>
+#include "string_conversion.hh"
 
 namespace tools
 {
@@ -13,14 +13,9 @@ namespace tools
     if (reader.fail())
       throw std::runtime_error{"TSV Parser can't open file"};
 
-    std::time_t ts;
-    std::from_chars(minimum_timestamp.data(),
-                    minimum_timestamp.data() + minimum_timestamp.size(),
-                    ts);
+    std::time_t ts = string_to<std::time_t>(minimum_timestamp);
     min_ts_ = std::chrono::system_clock::from_time_t(ts);
-    std::from_chars(maximum_timestamp.data(),
-                    maximum_timestamp.data() + maximum_timestamp.size(),
-                    ts);
+    ts = string_to<std::time_t>(maximum_timestamp);
     max_ts_ = std::chrono::system_clock::from_time_t(ts);
   }
 
@@ -38,10 +33,7 @@ namespace tools
       if (reader.eof())
         break;
 
-      std::time_t ts;
-      std::from_chars(timestamp_str.data(),
-                      timestamp_str.data() + timestamp_str.size(),
-                      ts);
+      std::time_t ts = string_to<std::time_t>(timestamp_str);
       time_point = std::chrono::system_clock::from_time_t(ts);
 
     } while (time_point < min_ts_ || time_point > max_ts_);

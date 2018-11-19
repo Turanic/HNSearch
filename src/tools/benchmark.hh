@@ -4,6 +4,13 @@
 #include <memory>
 #include <unordered_map>
 
+/* Custom library to micro benchmark some part of the code.
+ * BENCH_START give you an object. Its lifetime should correspond
+ * to the code you would like to benchmark. BENCH_STOP can be used
+ * to directly end the recording time of a benchmark.
+ *
+ * Benchmarks are displayed at the end of the program.
+ * Remark: Benchmark macro are disabled on release builds. */
 #ifndef NDEBUG
 #define BENCH_START(name, bench)                                               \
   auto name = tools::Benchmark::benchmark_get().start_bench(bench)

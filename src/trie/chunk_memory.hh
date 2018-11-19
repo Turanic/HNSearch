@@ -6,6 +6,9 @@
 
 namespace trie
 {
+  /* ChunkMemory is a Pool of strings parts used in the trie.
+   * This permit to strings to be allocated only once and only
+   * referenced in the Trie */
   class ChunkMemory
   {
   public:

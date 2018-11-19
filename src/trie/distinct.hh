@@ -4,6 +4,8 @@
 
 namespace trie
 {
+  /* Distinct command keep track of the number of distinct
+   * words inserted in a trie. */
   class Distinct
   {
   public:

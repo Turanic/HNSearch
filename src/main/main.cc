@@ -1,32 +1,38 @@
 #include <cassert>
+#include <charconv>
 #include <iostream>
 #include "options/parser.hh"
 #include "tools/benchmark.hh"
 #include "tools/logger.hh"
+#include "tools/string_conversion.hh"
 #include "tools/tsv_parser.hh"
 #include "trie/distinct.hh"
 #include "trie/top_list.hh"
 #include "trie/trie.hh"
 
-enum class mode
-{
-  failure,
-  distinct,
-  top
-};
-
 namespace
 {
+  enum class mode
+  {
+    failure,
+    distinct,
+    top
+  };
+
+  /* Use the custom options parser to parse the command line.
+   * It will first define the command line possible options,
+   * then it will parse the command line and finally return
+   * the important values extracted from the command line. */
   auto parse_command_line(int argc, char* argv[])
   {
     options::OptionsParser opts{argc, argv};
 
     mode current_mode = mode::failure;
 
-    std::string_view file{};
-    std::string_view nb_queries{};
-    std::string_view ts_from = "0";
-    std::string_view ts_to = "2147483647";
+    std::string_view file{};               // file name
+    std::string_view nb_queries{};         // number of queries in top mode
+    std::string_view ts_from = "0";        // minimum timestamp
+    std::string_view ts_to = "2147483647"; // maximum timestamp
 
     auto opt_distinct = opts.add_option("distinct");
     opt_distinct->with_position(1)
@@ -49,6 +55,10 @@ namespace
     opt_ts_to->with_value({&ts_to, options::ValPos::after});
 
 #ifndef NDEBUG
+    /* log and bench are two customs options I used in debug mode to
+     * active logging or benchmarking features. In release mode, the
+     * logging/benchmarks are not generated so those options are
+     * useless */
     {
       using namespace tools;
       opts.add_option("--log")->with_parse_cb(
@@ -76,6 +86,8 @@ namespace
     return std::make_tuple(file, nb_queries, ts_from, ts_to, current_mode);
   }
 
+  /* This function will extract all words from parser prs and insert those
+   * in the Trie words. It will then output the result of the trie command. */
   template <typename Command>
   void parse_datas(trie::Trie<Command>& words, tools::TSVParser& prs)
   {
@@ -94,6 +106,7 @@ namespace
 
     if constexpr (std::is_same_v<Command, trie::TopList>)
     {
+      /* TopList command yield a vector of the most frequent words */
       auto results = words.command_get_result();
       for (const auto& [word, freq] : results)
         std::cout << word << " " << freq << '\n';
@@ -102,13 +115,14 @@ namespace
 
     if constexpr (std::is_same_v<Command, trie::Distinct>)
     {
+      /* Distinct command yield the number of distinct words */
       std::cerr << words.command_get_result() << '\n';
       return;
     }
   }
 } // namespace
 
-int main(int argc, char* argv[])
+int main(int argc, char* argv[]) try
 {
   auto [file, nb_queries, ts_from, ts_to, cmode] =
     parse_command_line(argc, argv);
@@ -131,7 +145,7 @@ int main(int argc, char* argv[])
   }
   case mode::top:
   {
-    trie::Trie<trie::TopList> trie{10u};
+    trie::Trie<trie::TopList> trie{tools::string_to<unsigned>(nb_queries)};
     parse_datas(trie, prs);
     break;
   }
@@ -140,4 +154,9 @@ int main(int argc, char* argv[])
   }
 
   return 0;
+}
+catch (const std::exception& e)
+{
+  std::cerr << e.what() << '\n';
+  return 1;
 }
