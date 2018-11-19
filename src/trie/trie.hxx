@@ -99,12 +99,6 @@ namespace trie
   }
 
   template <typename Command>
-  unsigned Trie<Command>::get_distinct_queries() const
-  {
-    return distinct_queries_;
-  }
-
-  template <typename Command>
   template <typename... Args>
   Trie<Command>::Trie(Args&&... args)
       : cmd_{&nodes_, std::forward<Args>(args)...}

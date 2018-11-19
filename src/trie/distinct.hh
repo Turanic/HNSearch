@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include "node.hh"
 
 namespace trie

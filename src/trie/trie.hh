@@ -3,11 +3,12 @@
 #include <string_view>
 #include <vector>
 #include "chunk_memory.hh"
+#include "dummy.hh"
 #include "node.hh"
 
 namespace trie
 {
-  template <typename Command>
+  template <typename Command = Dummy>
   class Trie
   {
   public:
@@ -18,7 +19,6 @@ namespace trie
     void emplace(std::string_view element);
     std::size_t size() const;
     unsigned get_distinct_queries() const;
-    std::vector<std::pair<std::string, unsigned>> get_top_queries() const;
 
     typename Command::result_t command_get_result() const;
 
@@ -30,9 +30,6 @@ namespace trie
     ChunkMemory chunks_{};
 
     Command cmd_;
-
-    /* distinct counter */
-    unsigned distinct_queries_ = 0;
   };
 } // namespace trie
 
