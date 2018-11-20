@@ -54,6 +54,17 @@ Usage:
 
 The input\_file should be a tsv file formated as described in the subject.
 
+## Integration
+
+In the integration folder, there is a Dockerfile. You can build the image,
+and launch a container with limited memory to test out the software execution.
+
+```sh
+cd integration && \
+docker build -t hnstat . && \
+docker run --rm --memory="512M" hnstat
+```
+
 # Data structures
 
 ## The Trie

@@ -46,8 +46,8 @@ namespace tools
 
     void enable();
 
-    struct Timer;
     struct Stat;
+    class Timer;
     std::unique_ptr<Timer> start_bench(const std::string& name);
 
   private:
