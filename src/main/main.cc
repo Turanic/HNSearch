@@ -91,6 +91,7 @@ namespace
   template <typename Command>
   void parse_datas(trie::Trie<Command>& words, tools::TSVParser& prs)
   {
+    BENCH_START(bench_1, "all insertion");
     while (true)
     {
       auto [tm, elt, eof] = prs.read_element();
@@ -102,8 +103,11 @@ namespace
       LOG("processing string %s\n", elt.c_str());
       words.emplace(elt);
     }
+    BENCH_STOP(bench_1);
     LOG("Final tree is composed of %lu nodes\n", words.size());
 
+    BENCH_START(bench_2, "result extraction");
+    while (true)
     if constexpr (std::is_same_v<Command, trie::TopList>)
     {
       /* TopList command yield a vector of the most frequent words */
@@ -133,7 +137,6 @@ int main(int argc, char* argv[]) try
       ts_from.data(),
       ts_to.data());
 
-  BENCH_START(bench_1, "full execution");
   tools::TSVParser prs{file.data(), ts_from, ts_to};
   switch (cmode)
   {
