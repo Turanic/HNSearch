@@ -32,6 +32,9 @@ namespace trie
     typename Command::result_t command_get_result() const;
 
   private:
+    /* common code for all constructors */
+    void init();
+
     /* helper function the insert a range of characters in the trie with
      * root node at index root_idx */
     template <typename InputIt>

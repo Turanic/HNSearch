@@ -1,13 +1,34 @@
 # HNStat
 
+# Subject
+
+The goal of this test is to evaluate your ability to parse & process a large
+amount of data, using the appropriate data structures and algorithms to solve a
+simple challenge.
+The provided data file is a TSV file listing all queries performed on HN Search
+during a few days. Each line contains the timestamp and the query separated by
+a tab. The goal is to extract the popular (most frequent) queries that have
+been done during a specific time range.
+
 # Build the project
+
+## Requirements
+
+To build this project, you should have:
+
+ - CMake >= 3.9
+ - g++ >= 8.2 or clang++ >= 7.0.0
+ - Address Sanitizer for debug builds
+
+## Instruction
 
 This project uses CMake/Make as the build system.
 Three build modes are possible:
 
  - Release: full optimization
  - RelWithDebInfo: some optimizations + benchmarks/logs + asserts + debug infos
- - Debug: no optimizations + benchmark/logs + asserts + debug infos + sanitizers linked + unit tests
+ - Debug: no optimizations + benchmark/logs + asserts + debug infos + sanitizers
+ linked + unit tests
 
 You can do the following commands to build the project:
 ```bash
@@ -22,6 +43,16 @@ above in Release mode.
 Remark: I coded some basic unit tests. You can launch them after building the
 project in debug mode. Just call `make test`.
 
+Now you can run the binary located in the `out` directory. Here is how
+to use it:
+
+```sh
+Usage:
+  ./hnStat distinct [--from TIMESTAMP] [--to TIMESTAMP] input_file
+  ./hnStat top nb_queries [--from TIMESTAMP] [--to TIMESTAMP] input_file
+```
+
+The input\_file should be a tsv file formated as described in the subject.
 
 # Data structures
 

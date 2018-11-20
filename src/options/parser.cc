@@ -80,10 +80,10 @@ namespace options
     if (cmd_pos >= cmd_.size())
       return;
 
-    const auto& [str, validated] = cmd_[cmd_pos];
-    assert(not validated);
+    const auto& cmd_elt = cmd_[cmd_pos];
+    assert(not cmd_elt.second);
 
-    if (str != opt.label)
+    if (cmd_elt.first != opt.label)
       return;
 
     for (auto& val : opt.values)

@@ -129,20 +129,26 @@ namespace trie
   Trie<Command>::Trie(Args&&... args)
       : cmd_{&nodes_, std::forward<Args>(args)...}
   {
-    nodes_.resize(1);
-
-    LOG("sizeof(node) = %lu\n", sizeof(node));
-    LOG("sizeof(edge) = %lu\n", sizeof(edge));
+    init();
   }
 
   template <typename Command>
   Trie<Command>::Trie()
       : cmd_{&nodes_}
   {
-    nodes_.resize(1);
+    init();
+  }
 
+  template <typename Command>
+  void Trie<Command>::init()
+  {
     LOG("sizeof(node) = %lu\n", sizeof(node));
     LOG("sizeof(edge) = %lu\n", sizeof(edge));
+    nodes_.resize(1);
+    // root node
+
+    nodes_.reserve(1024 * 1024);
+    // should be enought. If not realloc is not thaaat costly
   }
 
   template <typename Command>

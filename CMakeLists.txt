@@ -11,7 +11,9 @@ set(CMAKE_CXX_FLAG_DEBUG "-O0 -ggdb3 -fsanitize=address")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-Og -ggdb3")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 
-enable_testing()
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  enable_testing()
+endif()
 
 # sources/exe dirs
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/out/)

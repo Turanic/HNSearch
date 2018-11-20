@@ -1,6 +1,7 @@
 #!/bin/sh
 
-BASEDIR=$(dirname "$0")
+SCRIPT=$(readlink -f "$0")
+BASEDIR=$(dirname "$SCRIPT")
 BUILD_DIR=_build
 
 mkdir -p ${BUILD_DIR} && \
