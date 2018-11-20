@@ -107,7 +107,6 @@ namespace
     LOG("Final tree is composed of %lu nodes\n", words.size());
 
     BENCH_START(bench_2, "result extraction");
-    while (true)
     if constexpr (std::is_same_v<Command, trie::TopList>)
     {
       /* TopList command yield a vector of the most frequent words */

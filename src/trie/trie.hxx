@@ -103,19 +103,17 @@ namespace trie
     {
       /* create the left son node */
       nodes_[inter_idx].children.emplace_back(left_chunk.data(),
-                                              right_chunk.size(),
+                                              left_chunk.size(),
                                               left_idx);
       nodes_.emplace_back(node{}).parent = inter_idx;
+      ++nodes_[left_idx].freq;
+
+      return left_idx;
     }
 
-    if (left_chunk.empty())
-    {
-      ++nodes_[inter_idx].freq;
-      return inter_idx;
-    }
+    ++nodes_[inter_idx].freq;
 
-    ++nodes_[left_idx].freq;
-    return left_idx;
+    return inter_idx;
   }
 
   template <typename Command>
