@@ -58,11 +58,15 @@ The input\_file should be a tsv file formated as described in the subject.
 
 In the integration folder, there is a Dockerfile. You can build the image,
 and launch a container with limited memory to test out the software execution.
+The Dockerfile takes the example tsv file (in the tar archive), extract it and
+put in in the container. You can changes args if you want to, but keep the
+same file name (use the --entrypoint docker option to do that, if you want
+to).
 
 ```sh
 cd integration && \
 docker build -t hnstat . && \
-docker run --rm --memory="512M" hnstat
+docker run --rm --memory="512M" --entrypoint "./hnStat" hnstat top 10 hn_logs.tsv
 ```
 
 # Data structures
@@ -70,7 +74,7 @@ docker run --rm --memory="512M" hnstat
 ## The Trie
 
 I used a prefix tree instead of an hash map because it uses less memory.
-Most of the time queries are quite similar most, and the trie permit to
+Most of the time queries are quite similar, and the trie permit to
 reduce allocation of similar parts of a string.
 
 The trie will then perform insertions in O(m) with m the length of the string
